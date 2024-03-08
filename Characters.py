@@ -3,7 +3,7 @@ from os import system
 from time import sleep
 from typing import Type
 
-from Items import Item
+from Items import Armour, Item
 from color import TermColors
 
 
@@ -127,7 +127,7 @@ class Player(Character):
     atk_pts : int = 25
     def_pts : int = 25
     atk_options : dict = {"SLASH": 2, "STAB": 2, "TACKLE": 1.5}
-    equipped_list = list[Item] = [None] * 5
+    equipped_list = list[Item] = [None] * 4
     
     def __init__(self, name:str, max_health:int, current_health:int, max_mana:int, current_mana:int) -> None:
         super().__init__(name=name, char_type="PLAYER", max_health=max_health, current_health=current_health, max_mana=max_mana, current_mana=current_mana)
@@ -281,19 +281,36 @@ class Player(Character):
     def equip(self) -> None:
         t = TermColors()
         invent = self.get_inventory()
-        t._print_green("[EQUIPMENT SCREEN]")
-        counter = 1
-        for i in range(0, self.get_inventory_len()):
-            item = invent[i]
-            if item.get_item_type() == "WEAPON" or item.get_item_type() == "AMOUR":
-                t._print_green(f"{counter}. {item.get_item_name()} -> {item.cameo()} -> EQUIPABLE\n")
-                counter += 1
-        t._print_green("[ENTER 0 TO EXIT]\n")
-        t._print_green("[ENTER CHOICE] -> ")
+        def display_equipment(lst):
+            t._print_green("[EQUIPMENT SCREEN]")
+            counter = 1
+            for i in range(0, self.get_inventory_len()):
+                item = lst[i]
+                if item.get_item_type() == "WEAPON" or item.get_item_type() == "ARMOUR":
+                    t._print_green(f"{counter}. {item.get_item_name()} -> {item.cameo()} -> EQUIPABLE\n")
+                    counter += 1
+            t._print_green("[ENTER 0 TO EXIT]\n")
+            t._print_green("[ENTER CHOICE] -> ")
+        display_equipment(invent)
         choice = input()
-
-        # TODO: set equipment logic
-
+        # TODO: Working right here. Put in case for when armour is already present and resave to inventory. Then work on weapon
+        while int(choice) != 0:
+                p_choice = int(choice) -1 
+                if p_choice < len(invent):
+                    equipable = invent[p_choice]
+                    if equipable.get_item_type()  == "ARMOUR":
+                        if equipable.get_body_placement() == Armour.HEAD:
+                            if self.get_equipped_list()[Armour.HEAD] == None:
+                                self.get_equipped_list()[Armour.HEAD] = equipable
+                        
+                        elif equipable.get_body_placement() == Armour.CHEST:
+                            if self.get_equipped_list()[Armour.CHEST] == None:
+                                self.get_equipped_list()[Armour.CHEST] = equipable
+                        
+                        elif equipable.get_body_placement() == Armour.FEET:
+                            if self.get_equipped_list()[Armour.FEET] == None:
+                                self.get_equipped_list()[Armour.FEET] = equipable
+                                
 
 class Enemy(Character):
     class_type : str

@@ -1,6 +1,5 @@
 from color import TermColors
 
-# TODO: tell whether items that are equipable go to which body part
 
 class Item:
     item_type : str = ""
@@ -79,12 +78,21 @@ class Weapon(Item):
     def cameo(self) -> str:
         return f"ATTACK: {self.get_item_damage()}; DEFENSE: {self.get_item_defense()};"
 
-class Amour(Item):
+class Armour(Item):
 
-    def __init__(self, item_type: str, item_name: str, damage: int, defense: int, description: str) -> None:
+    body_placement: int
+    HEAD = 0
+    CHEST = 1
+    FEET = 2
+
+    def __init__(self, item_type: str, item_name: str, damage: int, defense: int, description: str, body_placement: int) -> None:
         super().__init__(item_type, item_name, damage, defense, description)
+        self.body_placement = body_placement
 
     
+    def get_body_placement(self) -> str:
+        return self.body_placement
+
     def add_amour(self, player) -> None:
         player.set_defense_pts(player.get_defense_pts() + self.get_item_defense())
         self.t._print_green(f"[{self.get_item_name()} EQUIPPED] -> {player.get_name()} IS WEARING {self.get_item_name()}")
